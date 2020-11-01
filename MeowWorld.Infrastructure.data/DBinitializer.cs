@@ -1,5 +1,5 @@
 ﻿using System;
-using MeowWorld.Core.Entity;
+using Meow.Core.Entity;
 
 namespace MeowWorld.Infrastructure.data
 {

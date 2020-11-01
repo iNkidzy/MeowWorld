@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MeowWorld.Core.Entity
+namespace Meow.Core.Entity
 {
     public class Owner
     {

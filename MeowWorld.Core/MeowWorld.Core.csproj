@@ -12,4 +12,7 @@
   <ItemGroup>
     <Compile Remove="MeowWorld.Core.Entity\Cats.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Meow.Core.Entity\Meow.Core.Entity.csproj" />
+  </ItemGroup>
 </Project>

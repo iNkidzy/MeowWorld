@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MeowWorld.Core.DomainService;
-using MeowWorld.Core.Entity;
+using Meow.Core.Entity;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeowWorld.Infrastructure.data.Repositories

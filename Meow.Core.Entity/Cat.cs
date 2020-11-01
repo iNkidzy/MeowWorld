@@ -1,5 +1,5 @@
 ﻿using System;
-namespace MeowWorld.Core.Entity
+namespace Meow.Core.Entity
 {
     public class Cat
     {

@@ -20,7 +20,7 @@
     "WebApi": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "weatherforecast",
+      "launchUrl": "https://localhost:46296/api/cats",
       "applicationUrl": "https://localhost:46296;http://localhost:50612",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

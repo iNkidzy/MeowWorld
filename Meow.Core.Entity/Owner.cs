@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Meow.Core.Entity
 {
@@ -7,6 +8,7 @@ namespace Meow.Core.Entity
     {
         public int Id { get; set; }
 
+        [Required]
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }

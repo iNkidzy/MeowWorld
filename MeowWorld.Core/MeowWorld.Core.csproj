@@ -9,4 +9,7 @@
     <Folder Include="DomainService\" />
     <Folder Include="ApplicationService\Services\" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="MeowWorld.Core.Entity\Cats.cs" />
+  </ItemGroup>
 </Project>

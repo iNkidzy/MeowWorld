@@ -4,12 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Meow.Core.Entity;
 using MeowWorld.Core.ApplicationService;
 using MeowWorld.Core.ApplicationService.Services;
 using MeowWorld.Core.DomainService;
 using MeowWorld.Infrastructure.data;
+using MeowWorld.Infrastructure.data.Helpers;
 using MeowWorld.Infrastructure.data.Repositories;
 using Microsoft.AspNetCore.Authentication.Certificate;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -19,6 +22,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 
@@ -63,45 +67,51 @@ namespace WebApi
 
             //AUTHENTICATION
 
-            // Create a byte array with random values. This byte array is used
-            // to generate a key for signing JWT tokens.
-            //Byte[] secretBytes = new byte[40];
-            //Random rand = new Random();
-            //rand.NextBytes(secretBytes);
+            // Create a byte array with random values.This byte array is used
+            //to generate a key for signing JWT tokens.
+           Byte[] secretBytes = new byte[40];
+            Random rand = new Random();
+            rand.NextBytes(secretBytes);
 
-            ////Add JWT based authentication
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-            //{
-            //    options.TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        ValidateAudience = false,
-            //        //ValidAudience = "TodoApiClient",
-            //        ValidateIssuer = false,
-            //        //ValidIssuer = "TodoApi",
-            //        ValidateIssuerSigningKey = true,
-            //        IssuerSigningKey = new SymmetricSecurityKey(secretBytes),
-            //        ValidateLifetime = true, //validate the expiration and not before values in the token
-            //        ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
-            //    };
-            //});
+            //Add JWT based authentication
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    //ValidAudience = "TodoApiClient",
+                    ValidateIssuer = false,
+                    //ValidIssuer = "TodoApi",
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(secretBytes),
+                    ValidateLifetime = true, //validate the expiration and not before values in the token
+                    ClockSkew = TimeSpan.FromMinutes(5) //5 minute tolerance for the expiration date
+                };
+            });
 
+            //// In-memory database:
+            //services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("TodoList"));
 
-            //services.AddSingleton<IAuthenticationHelper>(new
-            //  AuthenticationHelper(secretBytes));
-
-
-           
+          
 
             //REPOS implementation in configureServices
 
             //var serviceCollection = new ServiceCollection();////
+            // Register repositories for dependency injection
+            services.AddScoped<IRepository<TodoItem>, TodoItemRepo>();
+            services.AddScoped<IRepository<User>, UserRepo>();
             services.AddScoped<ICatRepository, CatRepo>();
             services.AddScoped<ICatService, CatService>();
             services.AddScoped<IOwnerRepository, OwnerRepo>();
             services.AddScoped<IOwnerService, OwnerService>();
             services.AddTransient<IDBinitializer, DBinitializer>();
 
-            services.AddControllers();
+            services.AddSingleton<IAuthenticationHelper>(new
+              AuthenticationHelper(secretBytes));
+
+
+           
+
 
             //NEWtonsoftJson
             services.AddMvc().AddNewtonsoftJson();
@@ -150,7 +160,7 @@ namespace WebApi
                    CertificateAuthenticationDefaults.AuthenticationScheme)
                .AddCertificate();
 
-
+            services.AddControllers();
 
         }
 
@@ -162,28 +172,12 @@ namespace WebApi
                 // Initialize the database
                 var services = scope.ServiceProvider;
                 var ctx = scope.ServiceProvider.GetService<MEOWcontext>();
-                //ctx.Database.EnsureDeleted();
-                //ctx.Database.EnsureCreated(); <--Reside in the DBinitializer
                 var dbInitializer = services.GetService<IDBinitializer>();
                 dbInitializer.InitData(ctx);
 
 
             }
 
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            } 
-            else
-            {
-                app.UseHsts();
-                using (var scope = app.ApplicationServices.CreateScope())
-                {
-                    var ctx = scope.ServiceProvider.GetService<MEOWcontext>();
-                    ctx.Database.EnsureCreated();
-                }
-            }
 
             app.UseSwagger();
 
@@ -194,7 +188,19 @@ namespace WebApi
                 });
 
 
-
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseHsts();
+                using (var scope = app.ApplicationServices.CreateScope())
+                {
+                    var ctx = scope.ServiceProvider.GetService<MEOWcontext>();
+                    ctx.Database.EnsureCreated();
+                }
+            }
 
             app.UseHttpsRedirection();
 

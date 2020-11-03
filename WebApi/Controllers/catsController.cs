@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {
-    [Produces("application/json")]
+    //[Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class catsController : ControllerBase

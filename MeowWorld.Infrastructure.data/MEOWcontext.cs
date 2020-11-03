@@ -18,6 +18,8 @@ namespace MeowWorld.Infrastructure.data
 
         public DbSet<Cat> Cats { get; set; }
         public DbSet<Owner> Owners { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<TodoItem>TodoItems { get; set; }
        
     }
 }

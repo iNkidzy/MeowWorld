@@ -1,16 +1,58 @@
-﻿using System;
+﻿    using System;
+using System.Collections.Generic;
 using Meow.Core.Entity;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace MeowWorld.Infrastructure.data
 {
     public class DBinitializer :IDBinitializer
     {
+        private IAuthenticationHelper authenticationHelper;
 
+        public DBinitializer(IAuthenticationHelper authHelper)
+        {
+            authenticationHelper = authHelper;
+        }
 
         public void InitData(MEOWcontext ctx)
         {
             ctx.Database.EnsureDeleted();
             ctx.Database.EnsureCreated();
+
+            if (ctx.TodoItems.Any())
+            {
+                return;
+            }
+
+            List<TodoItem> items = new List<TodoItem>
+            {
+                new TodoItem { IsComplete=true, Name="I did it!!"},
+                new TodoItem { IsComplete=false, Name="Failed...again"},
+                new TodoItem { IsComplete=false, Name="<h3>Message from a Black Hat! Ha, ha, ha...<h3>"}
+            };
+
+            string password = "nadia";
+            byte[] passwordHashChili, passwordSaltChili, passwordHashNadia, passwordSaltNadia;
+
+            authenticationHelper.CreatePasswordHash(password, out passwordHashChili, out passwordSaltChili);
+            authenticationHelper.CreatePasswordHash(password, out passwordHashNadia, out passwordSaltNadia);
+
+            List<User> users = new List<User>
+            {
+                new User {
+                    Username = "UserChili",
+                    PasswordHash = passwordHashChili,
+                    PasswordSalt = passwordSaltChili,
+                    IsAdmin = false
+                },
+                new User {
+                    Username = "AdminNadia",
+                    PasswordHash = passwordHashNadia,
+                    PasswordSalt = passwordSaltNadia,
+                    IsAdmin = true
+                }
+            };
+
 
 
             Owner owner1 = ctx.Owners.Add(new Owner
@@ -122,6 +164,9 @@ namespace MeowWorld.Infrastructure.data
 
             }).Entity;
 
+            ctx.TodoItems.AddRange(items);
+            ctx.Users.AddRange(users);
+            
 
             ctx.SaveChanges();
         }

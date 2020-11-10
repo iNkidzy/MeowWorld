@@ -113,16 +113,7 @@ namespace WebApi
            
 
 
-            //NEWtonsoftJson
-            services.AddMvc().AddNewtonsoftJson();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-            services.AddControllers().AddNewtonsoftJson(options =>
-            {    // Use the default property (Pascal) casing
-
-                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                options.SerializerSettings.MaxDepth = 100;
-                //   options.SerializerSettings.MaxDepth = 2;  // 100 pet limit per owner
-            });
+           
 
 
             //SWAGGER
@@ -156,11 +147,22 @@ namespace WebApi
                     })
             );
 
-            services.AddAuthentication(
-                   CertificateAuthenticationDefaults.AuthenticationScheme)
-               .AddCertificate();
+           // services.AddAuthentication(
+           //       CertificateAuthenticationDefaults.AuthenticationScheme)
+           //    .AddCertificate();
 
-            services.AddControllers();
+            
+
+            //NEWtonsoftJson
+            //services.AddMvc().AddNewtonsoftJson();
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {    // Use the default property (Pascal) casing
+
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.MaxDepth = 100;
+                //   options.SerializerSettings.MaxDepth = 2;  // 100 pet limit per owner
+            });
 
         }
 
@@ -194,7 +196,7 @@ namespace WebApi
             }
             else
             {
-                app.UseHsts();
+               // app.UseHsts();
                 using (var scope = app.ApplicationServices.CreateScope())
                 {
                     var ctx = scope.ServiceProvider.GetService<MEOWcontext>();
